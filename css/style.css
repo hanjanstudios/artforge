@@ -24,7 +24,8 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+/* Anchor nav uses a manual smooth-scroll in main.js instead of this CSS property,
+   which fights ScrollTrigger's pinned/scrubbed sections (see js/gallery.js). */
 
 body {
   margin: 0;
@@ -218,6 +219,7 @@ section { position: relative; }
   position: fixed;
   inset: 0;
   z-index: 90;
+  overflow: hidden;
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -362,7 +364,7 @@ section { position: relative; }
 .features { max-width: var(--container); margin: 0 auto; padding: 120px var(--gutter) 40px; }
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
@@ -481,6 +483,190 @@ section { position: relative; }
 .critique-note p { margin: 0; font-size: 14px; color: var(--ink-soft); }
 
 @media (max-width: 860px) { .critique-mock { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   FORGED GALLERY (infinite scroll + content transition)
+   ============================================================ */
+.forge-gallery {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 120px var(--gutter) 100px;
+  --forge-stagger-scale: 1;
+  --forge-width-scale: 1;
+}
+
+.forge-gallery-viewport {
+  position: relative;
+  height: 620px;
+  max-height: 72vh;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--bg-alt);
+}
+.forge-gallery-viewport::before,
+.forge-gallery-viewport::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+.forge-gallery-viewport::before { top: 0; background: linear-gradient(var(--bg-alt), transparent); }
+.forge-gallery-viewport::after { bottom: 0; background: linear-gradient(transparent, var(--bg-alt)); }
+
+.forge-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 64px;
+  width: 100%;
+  padding: 48px 0;
+}
+
+.forge-slide {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transform: translateX(calc(var(--stagger, 0) * var(--forge-stagger-scale, 1)));
+}
+.forge-slide:focus-visible .forge-slide-media { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.forge-slide-media {
+  position: relative;
+  width: calc(var(--img-w, 200px) * var(--forge-width-scale, 1));
+  aspect-ratio: 0.78;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 140% at 22% 18%, hsla(calc(var(--hue, 20) + 25), 88%, 62%, .5), transparent 60%),
+    radial-gradient(120% 140% at 82% 88%, hsla(calc(var(--hue, 20) - 20), 75%, 42%, .55), transparent 58%),
+    linear-gradient(160deg, var(--paper-hi), var(--paper));
+}
+
+.forge-slide figcaption { margin-top: 14px; }
+.forge-slide-title { display: block; font-size: 14px; color: var(--ink-soft); }
+.forge-slide-medium { display: block; font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+
+.forge-gallery-hint { margin: 20px 0 0; font-size: 13px; color: var(--ink-faint); text-align: center; }
+
+@media (max-width: 760px) {
+  .forge-gallery { --forge-stagger-scale: 0.42; --forge-width-scale: 0.6; }
+  .forge-gallery-viewport { height: 460px; }
+}
+
+/* ---------- content transition overlay ---------- */
+.forge-detail {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--bg);
+}
+.forge-detail-inner { display: grid; grid-template-columns: minmax(280px, 42vw) 1fr; height: 100%; }
+
+.forge-detail-preview { position: relative; margin: 0; height: 100%; overflow: hidden; background: var(--paper); }
+.forge-detail-media {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 140% at 22% 18%, hsla(calc(var(--hue, 20) + 25), 88%, 62%, .5), transparent 60%),
+    radial-gradient(120% 140% at 82% 88%, hsla(calc(var(--hue, 20) - 20), 75%, 42%, .55), transparent 58%),
+    linear-gradient(160deg, var(--paper-hi), var(--paper));
+}
+
+.forge-detail-groups { display: flex; flex-direction: column; height: 100%; overflow-y: auto; padding: var(--gutter); }
+.forge-detail-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  padding: 0;
+  margin: 0 0 auto;
+}
+.forge-detail-back:hover { color: var(--ink); }
+.forge-detail-back span { color: var(--ink-faint); margin-left: 6px; }
+
+.forge-detail-group { display: none; margin: auto 0; max-width: 56ch; }
+.forge-detail-group.active { display: block; }
+.forge-detail-medium {
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 14px;
+}
+.forge-detail-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(30px, 4.4vw, 52px);
+  line-height: 1.08;
+  margin: 0 0 22px;
+}
+.forge-detail-desc { margin: 0; font-size: 16px; color: var(--ink-soft); line-height: 1.6; }
+.forge-detail-desc .char, .forge-detail-back .char { display: inline-block; }
+
+@media (max-width: 860px) {
+  .forge-detail-inner { grid-template-columns: 1fr; grid-template-rows: 38vh 1fr; }
+  .forge-detail-groups { padding: 24px var(--gutter) 48px; }
+}
+
+/* ============================================================
+   RESOURCES
+   ============================================================ */
+.resources { max-width: var(--container); margin: 0 auto; padding: 120px var(--gutter); }
+
+.resources-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.resources-intro p { margin: 0; max-width: 620px; font-size: 15px; color: var(--ink-soft); }
+
+.resources-open {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-hot);
+  white-space: nowrap;
+}
+.resources-open svg { transition: transform .3s var(--ease); }
+.resources-open:hover svg { transform: translate(2px, -2px); }
+
+.resources-embed {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+.resources-embed iframe {
+  display: block;
+  width: 100%;
+  height: 1000px;
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  .resources-embed iframe { height: 1400px; }
+}
 
 /* ============================================================
    TESTIMONIAL
