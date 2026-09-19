@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Grid Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to supplement Tailwind */
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+        }
+        /* Hide number input spin buttons for cleaner UI */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        /* Tab transitions */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5', // Indigo 600
+                        secondary: '#64748b', // Slate 500
+                        margin: '#f59e0b', // Amber 500 for margins
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen text-slate-800 p-4 md:p-8 flex flex-col items-center">
+
+    <header class="w-full max-w-6xl mb-8 text-center md:text-left">
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">Canvas Grid Planner</h1>
+        <p class="text-slate-500 mt-2 text-sm md:text-base">Calculate perfect grids, gaps, and centering margins for your canvas or paper.</p>
+    </header>
+
+    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Input Section (Left Column) -->
+        <section class="lg:col-span-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
+
+            <!-- Global Inputs (Paper Size & Units) -->
+            <h2 class="text-xl font-semibold mb-6 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm11 1H6v8l4-2 4 2V6z" clip-rule="evenodd" />
+                </svg>
+                Dimensions
+            </h2>
+
+            <div class="space-y-5 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Total Paper/Canvas Size</label>
+                    <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                            <input type="number" id="canvas-width" value="11" min="0.1" step="0.1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Width">
+                            <span class="absolute right-3 top-2 text-slate-400 text-sm">W</span>
+                        </div>
+                        <span class="text-slate-400">×</span>
+                        <div class="relative flex-1">
+                            <input type="number" id="canvas-height" value="8.5" min="0.1" step="0.1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Height">
+                            <span class="absolute right-3 top-2 text-slate-400 text-sm">H</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="unit-select" class="block text-sm font-medium text-slate-700 mb-1">Measurement Unit</label>
+                    <select id="unit-select" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none bg-white">
+                        <option value="in">Inches (in)</option>
+                        <option value="cm">Centimeters (cm)</option>
+                        <option value="mm">Millimeters (mm)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex bg-slate-100 p-1 rounded-lg mb-6">
+                <button id="btn-mode-fit" class="flex-1 py-2 text-sm font-medium rounded-md bg-white shadow text-slate-900 transition-all" onclick="switchMode('fit')">Divide to Fit</button>
+                <button id="btn-mode-fixed" class="flex-1 py-2 text-sm font-medium rounded-md text-slate-500 hover:text-slate-700 transition-all" onclick="switchMode('fixed')">Fixed Square Size</button>
+            </div>
+
+            <!-- Mode 1: Divide to Fit Inputs -->
+            <div id="tab-fit" class="tab-content active space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Grid Divisions</label>
+                    <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                            <input type="number" id="fit-cols" value="4" min="1" step="1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Cols">
+                            <span class="absolute right-3 top-2 text-slate-400 text-sm">Cols</span>
+                        </div>
+                        <span class="text-slate-400">×</span>
+                        <div class="relative flex-1">
+                            <input type="number" id="fit-rows" value="4" min="1" step="1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Rows">
+                            <span class="absolute right-3 top-2 text-slate-400 text-sm">Rows</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Gap Size (Between Cells)</label>
+                    <div class="relative w-full">
+                        <input type="number" id="fit-gap" value="0.25" min="0" step="0.05" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Gap">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-amber-700 mb-1">Margin Size (Outer Edges)</label>
+                    <div class="relative w-full">
+                        <input type="number" id="fit-margin" value="0.5" min="0" step="0.1" class="w-full pl-3 pr-8 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition outline-none bg-amber-50" placeholder="Margin">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode 2: Fixed Square Size Inputs -->
+            <div id="tab-fixed" class="tab-content space-y-5">
+                <div class="p-3 bg-blue-50 border border-blue-100 rounded-lg mb-4">
+                    <p class="text-xs text-blue-800"><b>Auto-Centering:</b> Input exact square sizes. The margins will be calculated automatically to center the grid.</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Exact Square Size</label>
+                    <div class="relative w-full">
+                        <input type="number" id="fixed-size" value="4" min="0.1" step="0.1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Size">
+                        <span class="absolute right-3 top-2 text-slate-400 text-sm" id="fixed-size-unit-label">in</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Grid Pattern</label>
+                    <div class="flex items-center space-x-2">
+                        <div class="relative flex-1">
+                            <input type="number" id="fixed-cols" value="2" min="1" step="1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Cols">
+                            <span class="absolute right-3 top-2 text-slate-400 text-sm">Cols</span>
+                        </div>
+                        <span class="text-slate-400">×</span>
+                        <div class="relative flex-1">
+                            <input type="number" id="fixed-rows" value="2" min="1" step="1" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Rows">
+                            <span class="absolute right-3 top-2 text-slate-400 text-sm">Rows</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Gap Size (Between Squares)</label>
+                    <div class="relative w-full">
+                        <input type="number" id="fixed-gap" value="0.25" min="0" step="0.05" class="w-full pl-3 pr-8 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition outline-none" placeholder="Gap">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Output Section (Right Column) -->
+        <section class="lg:col-span-8 flex flex-col gap-6">
+
+            <!-- Visual Preview Card -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col flex-grow">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Proportional Preview
+                </h2>
+
+                <div class="bg-slate-50 rounded-xl border border-slate-200 border-dashed flex-grow min-h-[300px] lg:min-h-[400px] flex items-center justify-center p-4 relative overflow-hidden">
+                    <div id="preview-wrapper" class="w-full h-full flex items-center justify-center">
+                        <!-- SVG is dynamically sized via JS to maintain aspect ratio -->
+                        <svg id="canvas-preview" class="max-w-full max-h-full drop-shadow-md bg-white transition-all duration-300" style="width: 100%; height: 100%;" preserveAspectRatio="xMidYMid meet">
+                            <!-- SVG contents generated by JS -->
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start mt-3">
+                    <div class="text-sm text-slate-500" id="preview-label">
+                        11in × 8.5in
+                    </div>
+                    <div class="flex gap-4 text-xs">
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-amber-100 border border-amber-400"></div> Margin</span>
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-indigo-100 border border-indigo-400"></div> Gap</span>
+                        <span class="flex items-center gap-1"><div class="w-3 h-3 bg-white border border-slate-400"></div> Cell</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Measurements Guide Card -->
+            <div class="bg-indigo-50 p-6 rounded-2xl shadow-sm border border-indigo-100">
+                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 text-indigo-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Measurements Guide (from 0 on ruler)
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Vertical Lines -->
+                    <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm flex flex-col h-full">
+                        <h3 class="font-medium text-slate-800 mb-2 border-b pb-2">Vertical Marks (X-Axis)</h3>
+                        <p class="text-xs text-slate-500 mb-3">Place ruler horizontally, make marks at:</p>
+                        <div id="vertical-marks" class="text-sm font-mono text-indigo-700 flex flex-col gap-1 overflow-y-auto max-h-56">
+                            <!-- Filled by JS -->
+                        </div>
+                        <div class="mt-auto pt-3">
+                            <div id="vertical-gap-label" class="text-xs font-semibold text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horizontal Lines -->
+                    <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm flex flex-col h-full">
+                        <h3 class="font-medium text-slate-800 mb-2 border-b pb-2">Horizontal Marks (Y-Axis)</h3>
+                        <p class="text-xs text-slate-500 mb-3">Place ruler vertically, make marks at:</p>
+                        <div id="horizontal-marks" class="text-sm font-mono text-indigo-700 flex flex-col gap-1 overflow-y-auto max-h-56">
+                            <!-- Filled by JS -->
+                        </div>
+                        <div class="mt-auto pt-3">
+                            <div id="horizontal-gap-label" class="text-xs font-semibold text-slate-600 bg-slate-50 p-2 rounded border border-slate-100">
+                                <!-- Filled by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let currentMode = 'fit'; // 'fit' or 'fixed'
+
+        // DOM Elements
+        const el = {
+            width: document.getElementById('canvas-width'),
+            height: document.getElementById('canvas-height'),
+            unit: document.getElementById('unit-select'),
+
+            // Mode 1: Fit
+            fitCols: document.getElementById('fit-cols'),
+            fitRows: document.getElementById('fit-rows'),
+            fitGap: document.getElementById('fit-gap'),
+            fitMargin: document.getElementById('fit-margin'),
+
+            // Mode 2: Fixed
+            fixedSize: document.getElementById('fixed-size'),
+            fixedCols: document.getElementById('fixed-cols'),
+            fixedRows: document.getElementById('fixed-rows'),
+            fixedGap: document.getElementById('fixed-gap'),
+            fixedUnitLabel: document.getElementById('fixed-size-unit-label'),
+
+            // Outputs
+            svg: document.getElementById('canvas-preview'),
+            vMarks: document.getElementById('vertical-marks'),
+            hMarks: document.getElementById('horizontal-marks'),
+            vGap: document.getElementById('vertical-gap-label'),
+            hGap: document.getElementById('horizontal-gap-label'),
+            previewLabel: document.getElementById('preview-label')
+        };
+
+        function switchMode(mode) {
+            currentMode = mode;
+
+            // Update tabs UI
+            if (mode === 'fit') {
+                document.getElementById('btn-mode-fit').classList.add('bg-white', 'shadow', 'text-slate-900');
+                document.getElementById('btn-mode-fit').classList.remove('text-slate-500', 'hover:text-slate-700');
+
+                document.getElementById('btn-mode-fixed').classList.remove('bg-white', 'shadow', 'text-slate-900');
+                document.getElementById('btn-mode-fixed').classList.add('text-slate-500', 'hover:text-slate-700');
+
+                document.getElementById('tab-fit').classList.add('active');
+                document.getElementById('tab-fixed').classList.remove('active');
+            } else {
+                document.getElementById('btn-mode-fixed').classList.add('bg-white', 'shadow', 'text-slate-900');
+                document.getElementById('btn-mode-fixed').classList.remove('text-slate-500', 'hover:text-slate-700');
+
+                document.getElementById('btn-mode-fit').classList.remove('bg-white', 'shadow', 'text-slate-900');
+                document.getElementById('btn-mode-fit').classList.add('text-slate-500', 'hover:text-slate-700');
+
+                document.getElementById('tab-fixed').classList.add('active');
+                document.getElementById('tab-fit').classList.remove('active');
+            }
+
+            calculateGrid();
+        }
+
+        function calculateGrid() {
+            const w = parseFloat(el.width.value);
+            const h = parseFloat(el.height.value);
+            const unit = el.unit.value;
+
+            el.fixedUnitLabel.innerText = unit;
+
+            if (isNaN(w) || isNaN(h) || w <= 0 || h <= 0) {
+                showError('Invalid paper dimensions.');
+                return;
+            }
+
+            let cols, rows, gap, marginX, marginY, cellW, cellH;
+
+            if (currentMode === 'fit') {
+                // --- MODE 1: DIVIDE TO FIT ---
+                cols = parseInt(el.fitCols.value);
+                rows = parseInt(el.fitRows.value);
+                gap = parseFloat(el.fitGap.value) || 0;
+                let margin = parseFloat(el.fitMargin.value) || 0;
+                marginX = margin;
+                marginY = margin;
+
+                if (isNaN(cols) || isNaN(rows) || cols <= 0 || rows <= 0 || gap < 0 || margin < 0) {
+                    showError('Invalid grid inputs.');
+                    return;
+                }
+
+                const effW = w - (marginX * 2);
+                const effH = h - (marginY * 2);
+
+                if (effW <= 0 || effH <= 0) {
+                    showError('Margin is too large for canvas size!');
+                    return;
+                }
+
+                cellW = (effW - (cols - 1) * gap) / cols;
+                cellH = (effH - (rows - 1) * gap) / rows;
+
+                if (cellW <= 0 || cellH <= 0) {
+                    showError('Gap is too large for available area!');
+                    return;
+                }
+
+            } else {
+                // --- MODE 2: FIXED SQUARE SIZE ---
+                const size = parseFloat(el.fixedSize.value);
+                cols = parseInt(el.fixedCols.value);
+                rows = parseInt(el.fixedRows.value);
+                gap = parseFloat(el.fixedGap.value) || 0;
+
+                if (isNaN(size) || isNaN(cols) || isNaN(rows) || size <= 0 || cols <= 0 || rows <= 0 || gap < 0) {
+                    showError('Invalid fixed size inputs.');
+                    return;
+                }
+
+                cellW = size;
+                cellH = size;
+
+                // Calculate total width and height of the grid pattern
+                const gridTotalW = (cols * cellW) + ((cols - 1) * gap);
+                const gridTotalH = (rows * cellH) + ((rows - 1) * gap);
+
+                // Calculate centering margins
+                marginX = (w - gridTotalW) / 2;
+                marginY = (h - gridTotalH) / 2;
+
+                if (marginX < 0 || marginY < 0) {
+                    showError(`The fixed squares do not fit! Grid needs ${gridTotalW.toFixed(2)}x${gridTotalH.toFixed(2)}${unit}. Paper is only ${w}x${h}${unit}.`);
+                    return;
+                }
+            }
+
+            // Generate mark arrays
+            const vMarksList = generateMarks(w, marginX, cellW, gap, cols, unit, 'Left Margin', 'Right Margin');
+            const hMarksList = generateMarks(h, marginY, cellH, gap, rows, unit, 'Top Margin', 'Bottom Margin');
+
+            // Update UI
+            updateText(vMarksList, hMarksList, cellW, cellH, unit, w, h, cols, rows, marginX, marginY);
+            updatePreview(w, h, cols, rows, cellW, cellH, gap, marginX, marginY);
+        }
+
+        function generateMarks(totalSize, margin, cellSize, gap, count, unit, startLabel, endLabel) {
+            const marks = [];
+
+            // Only show margin indicator if there is an actual margin
+            if (margin > 0.001) {
+                 marks.push(`<span class="text-amber-600 block mb-1">➔ ${margin.toFixed(2)}${unit} (${startLabel})</span>`);
+            }
+
+            for (let i = 1; i < count; i++) {
+                const startPos = margin + (cellSize * i) + (gap * (i - 1));
+                const endPos = startPos + gap;
+
+                if (gap > 0) {
+                    marks.push(`[${startPos.toFixed(2)}${unit} to ${endPos.toFixed(2)}${unit}] Gap`);
+                } else {
+                    marks.push(`${startPos.toFixed(2)}${unit}`);
+                }
+            }
+
+            if (margin > 0.001) {
+                marks.push(`<span class="text-amber-600 block mt-1">➔ ${(totalSize - margin).toFixed(2)}${unit} (${endLabel})</span>`);
+            }
+
+            return marks;
+        }
+
+        function updateText(vMarks, hMarks, cellW, cellH, unit, w, h, cols, rows, marginX, marginY) {
+            el.vMarks.innerHTML = vMarks.length > 0 ? vMarks.join('\n') : 'None';
+            el.hMarks.innerHTML = hMarks.length > 0 ? hMarks.join('\n') : 'None';
+
+            let modeLabel = currentMode === 'fit' ? 'Calculated Cell' : 'Fixed Square';
+
+            let xLabelHTML = `<div>${modeLabel} Width: <b>${cellW.toFixed(2)}${unit}</b></div>`;
+            if(currentMode === 'fixed') xLabelHTML += `<div class="text-amber-700 mt-1">Calculated Margin (L/R): <b>${marginX.toFixed(2)}${unit}</b></div>`;
+
+            let yLabelHTML = `<div>${modeLabel} Height: <b>${cellH.toFixed(2)}${unit}</b></div>`;
+            if(currentMode === 'fixed') yLabelHTML += `<div class="text-amber-700 mt-1">Calculated Margin (T/B): <b>${marginY.toFixed(2)}${unit}</b></div>`;
+
+            el.vGap.innerHTML = xLabelHTML;
+            el.hGap.innerHTML = yLabelHTML;
+
+            el.previewLabel.innerHTML = `Paper: <b>${w}${unit} × ${h}${unit}</b> | Grid: <b>${cols}×${rows}</b>`;
+        }
+
+        function updatePreview(w, h, cols, rows, cellW, cellH, gap, marginX, marginY) {
+            el.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+            el.svg.innerHTML = '';
+
+            const strokeW = Math.max(w, h) * 0.003;
+
+            // 1. Draw Paper Background
+            createRect(0, 0, w, h, '#ffffff');
+
+            // 2. Draw Margins (if any)
+            if (marginX > 0 || marginY > 0) {
+                // Top, Bottom, Left, Right margin shading
+                createRect(0, 0, w, marginY, '#fef3c7');
+                createRect(0, h - marginY, w, marginY, '#fef3c7');
+                createRect(0, marginY, marginX, h - (marginY * 2), '#fef3c7');
+                createRect(w - marginX, marginY, marginX, h - (marginY * 2), '#fef3c7');
+
+                // Draw Margin Boundaries (dashed orange)
+                const marginBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                marginBox.setAttribute('x', marginX);
+                marginBox.setAttribute('y', marginY);
+                marginBox.setAttribute('width', w - (marginX * 2));
+                marginBox.setAttribute('height', h - (marginY * 2));
+                marginBox.setAttribute('fill', 'none');
+                marginBox.setAttribute('stroke', '#f59e0b');
+                marginBox.setAttribute('stroke-width', strokeW * 1.5);
+                marginBox.setAttribute('stroke-dasharray', `${strokeW * 3}, ${strokeW * 3}`);
+                el.svg.appendChild(marginBox);
+            }
+
+            // 3. Draw Inner Grid Columns
+            for (let i = 1; i < cols; i++) {
+                const x1 = marginX + (cellW * i) + (gap * (i - 1));
+                const x2 = x1 + gap;
+
+                createLine(x1, marginY, x1, h - marginY, '#4f46e5', strokeW);
+                if (gap > 0) {
+                    createLine(x2, marginY, x2, h - marginY, '#4f46e5', strokeW);
+                    createRect(x1, marginY, gap, h - (marginY * 2), '#e0e7ff');
+                }
+            }
+
+            // 4. Draw Inner Grid Rows
+            for (let i = 1; i < rows; i++) {
+                const y1 = marginY + (cellH * i) + (gap * (i - 1));
+                const y2 = y1 + gap;
+
+                createLine(marginX, y1, w - marginX, y1, '#4f46e5', strokeW);
+                if (gap > 0) {
+                    createLine(marginX, y2, w - marginX, y2, '#4f46e5', strokeW);
+                    createRect(marginX, y1, w - (marginX * 2), gap, '#e0e7ff');
+                }
+            }
+
+            // Re-draw overlap intersections
+            if (gap > 0) {
+                for (let i = 1; i < cols; i++) {
+                    for (let j = 1; j < rows; j++) {
+                        const x = marginX + (cellW * i) + (gap * (i - 1));
+                        const y = marginY + (cellH * j) + (gap * (j - 1));
+                        createRect(x, y, gap, gap, '#c7d2fe');
+                    }
+                }
+            }
+
+            // Draw outermost black stroke
+            const outerStroke = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            outerStroke.setAttribute('x', '0');
+            outerStroke.setAttribute('y', '0');
+            outerStroke.setAttribute('width', w);
+            outerStroke.setAttribute('height', h);
+            outerStroke.setAttribute('fill', 'none');
+            outerStroke.setAttribute('stroke', '#cbd5e1');
+            outerStroke.setAttribute('stroke-width', strokeW);
+            el.svg.appendChild(outerStroke);
+        }
+
+        function createLine(x1, y1, x2, y2, color, strokeW) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', strokeW * 0.5);
+            line.setAttribute('stroke-dasharray', `${strokeW * 2}, ${strokeW * 2}`);
+            el.svg.appendChild(line);
+        }
+
+        function createRect(x, y, width, height, fill) {
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', x);
+            rect.setAttribute('y', y);
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', fill);
+            rect.setAttribute('opacity', '0.7');
+            el.svg.appendChild(rect);
+        }
+
+        function showError(msg) {
+            el.svg.innerHTML = '';
+            el.vMarks.innerHTML = `<span class="text-red-500 font-bold">${msg}</span>`;
+            el.hMarks.innerHTML = `<span class="text-red-500 font-bold">${msg}</span>`;
+            el.vGap.innerHTML = '';
+            el.hGap.innerHTML = '';
+            el.previewLabel.textContent = 'Invalid configuration';
+        }
+
+        // Attach listeners to trigger recalculation on change
+        Object.keys(el).forEach(key => {
+            if (el[key] && el[key].tagName === 'INPUT' || el[key].tagName === 'SELECT') {
+                el[key].addEventListener('input', calculateGrid);
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', calculateGrid);
+
+    </script>
+</body>
+</html>

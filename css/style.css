@@ -624,6 +624,51 @@ section { position: relative; }
 }
 
 /* ============================================================
+   RESOURCES
+   ============================================================ */
+.resources { max-width: var(--container); margin: 0 auto; padding: 120px var(--gutter); }
+
+.resources-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.resources-intro p { margin: 0; max-width: 620px; font-size: 15px; color: var(--ink-soft); }
+
+.resources-open {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-hot);
+  white-space: nowrap;
+}
+.resources-open svg { transition: transform .3s var(--ease); }
+.resources-open:hover svg { transform: translate(2px, -2px); }
+
+.resources-embed {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+.resources-embed iframe {
+  display: block;
+  width: 100%;
+  height: 1000px;
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  .resources-embed iframe { height: 1400px; }
+}
+
+/* ============================================================
    TESTIMONIAL
    ============================================================ */
 .testimonial {
