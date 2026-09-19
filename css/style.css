@@ -364,7 +364,7 @@ section { position: relative; }
 .features { max-width: var(--container); margin: 0 auto; padding: 120px var(--gutter) 40px; }
 .feature-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1px;
   background: var(--line);
   border: 1px solid var(--line);
