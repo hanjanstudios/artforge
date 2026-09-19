@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hannah Janicke — Catalog</title>
+<meta name="description" content="A little card catalog of the things Hannah Janicke has built — the arty side and the professional side.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400&family=Caveat:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+
+<header class="hub-header">
+  <p class="eyebrow">Hi, I'm Hannah —</p>
+  <h1 class="hub-title">a little catalog of what I've <span class="italic">built.</span></h1>
+  <p class="hub-sub">Pull a card. Two drawers: one for the art, one for the business of houses.</p>
+</header>
+
+<main>
+  <section class="catalog" id="catalog">
+
+    <div class="holder holder-creative" data-side="creative">
+      <div class="holder-label">
+        <span class="tab">The Arty Side</span>
+      </div>
+      <div class="box">
+        <div class="box-shadow" aria-hidden="true"></div>
+        <div class="cards" id="creativeCards"><!-- cards injected --></div>
+      </div>
+    </div>
+
+    <div class="holder holder-professional" data-side="professional">
+      <div class="holder-label">
+        <span class="tab">The Real Estate Side</span>
+      </div>
+      <div class="box">
+        <div class="box-shadow" aria-hidden="true"></div>
+        <div class="cards" id="professionalCards"><!-- cards injected --></div>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="elsewhere">
+    <h2 class="elsewhere-title">Elsewhere</h2>
+    <nav class="link-row" id="linkRow" aria-label="All links">
+      <!-- blog + tool links injected, blog first -->
+    </nav>
+  </section>
+</main>
+
+<footer class="hub-footer">
+  <p>Made by hand, mostly. &copy; <span id="year"></span> Hannah Janicke.</p>
+</footer>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="overlay-scrim" id="overlayScrim"></div>
+  <article class="pulled-card" id="pulledCard" role="dialog" aria-modal="true" aria-labelledby="pulledTitle">
+    <button class="pulled-close" id="pulledClose" aria-label="Put the card back">×</button>
+    <p class="pulled-kicker" id="pulledKicker"></p>
+    <h3 class="pulled-title" id="pulledTitle"></h3>
+    <p class="pulled-desc" id="pulledDesc"></p>
+    <a class="pulled-visit" id="pulledVisit" href="#" target="_blank" rel="noopener">Visit site →</a>
+  </article>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
