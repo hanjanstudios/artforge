@@ -7,7 +7,7 @@
 <meta name="description" content="ArtForge pairs your work-in-progress art with structured critique from real artists, so you finish the piece instead of shelving it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,10 +17,12 @@
 <header class="site-header" id="siteHeader">
   <div class="header-inner">
     <a href="#top" class="logo">
-      <svg class="logo-mark" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 2L4 8v8l8 6 8-6V8l-8-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        <path d="M12 8l-4 3v4l4 3 4-3v-4l-4-3z" fill="currentColor" opacity="0.9"/>
-      </svg>
+      <span class="logo-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2L4 8v8l8 6 8-6V8l-8-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 8l-4 3v4l4 3 4-3v-4l-4-3z" fill="currentColor"/>
+        </svg>
+      </span>
       ArtForge
     </a>
 
@@ -51,27 +53,32 @@
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-visual" aria-hidden="true">
-      <canvas id="heroCanvas"></canvas>
-    </div>
-
-    <div class="hero-inner">
-      <p class="eyebrow reveal">For artists who never finish anything</p>
-      <h1 class="hero-title">
-        <span class="reveal-line"><span class="reveal-word">Unfinished art</span></span>
-        <span class="reveal-line"><span class="reveal-word italic">walks in.</span></span>
-        <span class="reveal-line"><span class="reveal-word">Finished art</span></span>
-        <span class="reveal-line"><span class="reveal-word italic">walks out.</span></span>
-      </h1>
-      <div class="hero-foot reveal">
-        <p class="hero-sub">ArtForge pairs your work-in-progress with structured critique from real artists — round by round — until the piece is actually done.</p>
-        <div class="hero-ctas">
-          <a href="#pricing" class="btn btn-solid" data-hover>
-            <span>Upload your first piece</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.4"/></svg>
-          </a>
-          <a href="#critique" class="btn btn-outline" data-hover>See a critique</a>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow reveal">// For artists who never finish anything</p>
+        <h1 class="hero-title">
+          <span class="reveal-line"><span class="reveal-word">Unfinished art</span></span>
+          <span class="reveal-line"><span class="reveal-word italic">walks in.</span></span>
+          <span class="reveal-line"><span class="reveal-word">Finished art</span></span>
+          <span class="reveal-line"><span class="reveal-word italic">walks out.</span></span>
+        </h1>
+        <div class="hero-foot reveal">
+          <p class="hero-sub">ArtForge pairs your work-in-progress with structured critique from real artists — round by round — until the piece is actually done.</p>
+          <div class="hero-ctas">
+            <a href="#pricing" class="btn btn-solid" data-hover>
+              <span>Upload your first piece</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H5M13 3V11" stroke="currentColor" stroke-width="1.4"/></svg>
+            </a>
+            <a href="#critique" class="btn btn-outline" data-hover>See a critique</a>
+          </div>
         </div>
+      </div>
+
+      <div class="hero-visual-frame reveal">
+        <div class="hero-visual" aria-hidden="true">
+          <canvas id="heroCanvas"></canvas>
+        </div>
+        <p class="frame-label">// Specimen 01 — The Forge Object</p>
       </div>
     </div>
 
@@ -205,7 +212,7 @@
   <!-- CTA / PRICING -->
   <section id="pricing" class="cta">
     <div class="cta-inner">
-      <p class="eyebrow reveal">Start free</p>
+      <p class="eyebrow reveal">// Start free</p>
       <h2 class="cta-title reveal">
         Stop abandoning<br> your best <span class="italic">ideas.</span>
       </h2>
@@ -224,10 +231,12 @@
 <footer class="site-footer">
   <div class="footer-inner">
     <a href="#top" class="logo" data-hover>
-      <svg class="logo-mark" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 2L4 8v8l8 6 8-6V8l-8-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        <path d="M12 8l-4 3v4l4 3 4-3v-4l-4-3z" fill="currentColor" opacity="0.9"/>
-      </svg>
+      <span class="logo-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2L4 8v8l8 6 8-6V8l-8-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 8l-4 3v4l4 3 4-3v-4l-4-3z" fill="currentColor"/>
+        </svg>
+      </span>
       ArtForge
     </a>
     <div class="footer-cols">

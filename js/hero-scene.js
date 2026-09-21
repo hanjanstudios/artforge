@@ -114,7 +114,7 @@
     void main() {
       vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / min(uResolution.x, uResolution.y);
 
-      vec3 ro = vec3(0.35, 0.0, 3.5);
+      vec3 ro = vec3(0.0, 0.05, 3.3);
       vec3 rd = normalize(vec3(uv, -1.65));
 
       // gentle parallax toward pointer
