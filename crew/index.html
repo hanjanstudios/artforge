@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrewCall — Find crew for your content</title>
+<meta name="description" content="CrewCall helps content creators find filmers, scriptwriters, editors, thumbnail designers and more — remote or on location.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/crew.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#top" class="logo">
+      <span class="logo-mark" aria-hidden="true">●</span>
+      CrewCall
+    </a>
+    <nav class="nav">
+      <a href="#browse">Browse crew</a>
+      <a href="#jobs">Job board</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="header-right">
+      <button class="btn btn-outline btn-small" data-open="joinModal">Join as crew</button>
+      <button class="btn btn-solid btn-small" data-open="jobModal">Post a job</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="eyebrow">// For YouTubers, TikTokers, streamers &amp; podcasters</p>
+    <h1 class="hero-title">Your channel needs a crew.<br><span class="italic">Here it is.</span></h1>
+    <p class="hero-sub">Find filmers who can shoot on location, scriptwriters who get retention, editors who understand pacing — people who already work in the creator economy.</p>
+
+    <form class="hero-search" id="heroSearch" role="search">
+      <label class="sr-only" for="heroQuery">What do you need?</label>
+      <input id="heroQuery" type="search" placeholder="Try &quot;vlog filmer in Austin&quot; or &quot;shorts editor&quot;">
+      <button class="btn btn-solid" type="submit">Search crew</button>
+    </form>
+
+    <div class="role-chips" id="roleChips" aria-label="Quick role filters"></div>
+
+    <dl class="stats">
+      <div><dt>Roles</dt><dd id="statRoles">—</dd></div>
+      <div><dt>Crew listed</dt><dd id="statCrew">—</dd></div>
+      <div><dt>Available now</dt><dd id="statAvail">—</dd></div>
+    </dl>
+  </section>
+
+  <!-- BROWSE -->
+  <section class="browse" id="browse">
+    <div class="section-head">
+      <h2 class="section-title">Browse crew</h2>
+      <span class="section-meta" id="resultCount"></span>
+    </div>
+
+    <div class="browse-grid">
+      <aside class="filters" aria-label="Filters">
+        <div class="filter-group">
+          <label for="fQuery">Keyword</label>
+          <input id="fQuery" type="search" placeholder="Name, skill, niche…">
+        </div>
+        <div class="filter-group">
+          <label for="fRole">Role</label>
+          <select id="fRole"><option value="">All roles</option></select>
+        </div>
+        <div class="filter-group">
+          <label for="fPlatform">Platform experience</label>
+          <select id="fPlatform"><option value="">Any platform</option></select>
+        </div>
+        <div class="filter-group">
+          <label for="fWork">Works</label>
+          <select id="fWork">
+            <option value="">Remote or on-site</option>
+            <option value="remote">Remote</option>
+            <option value="onsite">On location</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="fRate">Max day rate: <span id="fRateOut"></span></label>
+          <input id="fRate" type="range" min="100" max="1500" step="50" value="1500">
+        </div>
+        <label class="check"><input id="fAvail" type="checkbox"> Available now only</label>
+        <div class="filter-group">
+          <label for="fSort">Sort by</label>
+          <select id="fSort">
+            <option value="rating">Top rated</option>
+            <option value="rateAsc">Rate: low to high</option>
+            <option value="rateDesc">Rate: high to low</option>
+            <option value="projects">Most projects</option>
+          </select>
+        </div>
+        <button class="btn btn-outline btn-small" id="resetFilters" type="button">Reset filters</button>
+      </aside>
+
+      <div>
+        <div class="cards" id="cards"></div>
+        <p class="empty" id="empty" hidden>No crew match those filters. Try widening the rate or clearing the keyword.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOBS -->
+  <section class="jobs" id="jobs">
+    <div class="section-head">
+      <h2 class="section-title">Open gigs</h2>
+      <button class="btn btn-solid btn-small" data-open="jobModal">Post a job</button>
+    </div>
+    <ul class="job-list" id="jobList"></ul>
+  </section>
+
+  <!-- HOW -->
+  <section class="how" id="how">
+    <div class="section-head">
+      <h2 class="section-title">How it works</h2>
+    </div>
+    <ol class="steps">
+      <li><span class="step-n">01</span><h3>Search by role &amp; place</h3><p>Filter by what you need, where you shoot, the platforms they know, and your budget.</p></li>
+      <li><span class="step-n">02</span><h3>Check real work</h3><p>Every profile lists channels they've worked with and the formats they're good at.</p></li>
+      <li><span class="step-n">03</span><h3>Reach out or post a gig</h3><p>Message crew directly, or post a job and let them come to you.</p></li>
+    </ol>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span>© <span id="year"></span> CrewCall</span>
+  <span class="muted">Prototype — listings are sample data.</span>
+</footer>
+
+<!-- PROFILE MODAL -->
+<dialog class="modal" id="profileModal">
+  <button class="modal-close" data-close aria-label="Close">×</button>
+  <div id="profileBody"></div>
+</dialog>
+
+<!-- POST JOB MODAL -->
+<dialog class="modal" id="jobModal">
+  <button class="modal-close" data-close aria-label="Close">×</button>
+  <h2 class="modal-title">Post a job</h2>
+  <form id="jobForm" class="form">
+    <label>Job title<input name="title" required placeholder="Editor for weekly 20-min vlogs"></label>
+    <div class="form-row">
+      <label>Role<select name="role" required></select></label>
+      <label>Budget<input name="budget" required placeholder="$400 / video"></label>
+    </div>
+    <div class="form-row">
+      <label>Channel / creator name<input name="creator" required placeholder="@yourchannel"></label>
+      <label>Location<input name="location" placeholder="Remote, or city"></label>
+    </div>
+    <label>Details<textarea name="details" rows="4" placeholder="Format, cadence, style references, turnaround…"></textarea></label>
+    <button class="btn btn-solid" type="submit">Publish job</button>
+  </form>
+</dialog>
+
+<!-- JOIN MODAL -->
+<dialog class="modal" id="joinModal">
+  <button class="modal-close" data-close aria-label="Close">×</button>
+  <h2 class="modal-title">Join as crew</h2>
+  <form id="joinForm" class="form">
+    <div class="form-row">
+      <label>Name<input name="name" required></label>
+      <label>Role<select name="role" required></select></label>
+    </div>
+    <div class="form-row">
+      <label>City<input name="location" required placeholder="Los Angeles, CA"></label>
+      <label>Day rate (USD)<input name="rate" type="number" min="50" step="25" required></label>
+    </div>
+    <label>Skills (comma separated)<input name="skills" placeholder="Sony FX3, run-and-gun, color grading"></label>
+    <label>Channels you've worked with<input name="credits" placeholder="@channel1, @channel2"></label>
+    <label>Short bio<textarea name="bio" rows="3"></textarea></label>
+    <label class="check"><input type="checkbox" name="remote" checked> Open to remote work</label>
+    <button class="btn btn-solid" type="submit">Create profile</button>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

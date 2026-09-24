@@ -77,3 +77,21 @@ python3 -m http.server 8080
 
 Static site — deploys as-is to Vercel, Netlify, GitHub Pages, or any
 static host, no build command needed.
+
+## CrewCall (`/crew`)
+
+A separate prototype living in `crew/`: a directory where content creators
+find crew such as filmers, editors, scriptwriters and thumbnail designers.
+It's served at `/crew/` on the same host.
+
+```
+crew/index.html     Hero search, crew directory, job board, how-it-works
+crew/css/crew.css   Styles, reusing ArtForge's color/type tokens
+crew/js/data.js     Sample crew profiles, roles, and open gigs
+crew/js/app.js      Filtering/sorting, profile modal, post-job & join forms
+```
+
+There's no backend yet. Posted jobs and new crew profiles are saved to the
+visitor's `localStorage`, so only that browser sees them. Messages and
+"Apply" only show a confirmation. For real use you'd need a database, auth,
+and messaging (e.g. Supabase or Firebase).
