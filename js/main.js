@@ -57,6 +57,38 @@
     io.observe(el);
   });
 
+  /* ---------- sign-up form ---------- */
+  // Posts to FormSubmit's AJAX endpoint so the visitor stays on the page.
+  const signupForm = document.getElementById('signupForm');
+  const signupStatus = document.getElementById('signupStatus');
+
+  if (signupForm) {
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const button = signupForm.querySelector('button[type="submit"]');
+      button.disabled = true;
+      signupStatus.classList.remove('is-error');
+      signupStatus.textContent = 'Signing you up…';
+
+      try {
+        const res = await fetch(signupForm.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(signupForm)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || String(data.success) === 'false') throw new Error(data.message || 'Request failed');
+        signupForm.reset();
+        signupForm.hidden = true;
+        signupStatus.textContent = "You're in! We'll email you as soon as your account is ready.";
+      } catch (err) {
+        signupStatus.classList.add('is-error');
+        signupStatus.textContent = 'Something went wrong. Please try again in a moment.';
+        button.disabled = false;
+      }
+    });
+  }
+
   /* ---------- smooth in-page nav (accounts for fixed header) ---------- */
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', (e) => {
