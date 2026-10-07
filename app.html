@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArtForge Studio</title>
+<meta name="description" content="Upload your work-in-progress art, get pinned critiques, and track every version until it's finished.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="app-body">
+
+<header class="site-header scrolled app-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2L4 8v8l8 6 8-6V8l-8-6z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M12 8l-4 3v4l4 3 4-3v-4l-4-3z" fill="currentColor"/>
+        </svg>
+      </span>
+      ArtForge
+    </a>
+
+    <nav class="app-nav" id="appNav" hidden>
+      <a href="#/studio" class="nav-link" data-nav="studio">My studio</a>
+      <a href="#/explore" class="nav-link" data-nav="explore">Critique others</a>
+    </nav>
+
+    <div class="header-right" id="appHeaderRight" hidden>
+      <a href="#/new" class="btn btn-solid btn-small">+ New piece</a>
+      <button class="btn btn-outline btn-small" id="logoutBtn" type="button">Log out</button>
+    </div>
+  </div>
+</header>
+
+<main class="app-main" id="app" aria-live="polite">
+  <p class="app-loading">Loading…</p>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase-2.117.3.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

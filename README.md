@@ -7,12 +7,57 @@ build step, no external runtime dependencies — including the 3D hero.
 ## Structure
 
 ```
-index.html         Page markup (hero, features, how-it-works, critique
+index.html          Landing page (hero, features, how-it-works, critique
                     mockup, testimonial, CTA, footer)
+app.html            The studio app: sign up / log in, upload pieces,
+                    version history, pinned critiques
 css/style.css       Design system: tokens, layout, components, animations
+css/app.css         Studio app styles
 js/hero-scene.js    Interactive WebGL hero — a raymarched "forge orb"
-js/main.js          Scroll reveals, header behavior, mobile nav
+js/main.js          Landing page: scroll reveals, header, mobile nav
+js/app.js           Studio app logic (talks to Supabase)
+js/config.js        Your Supabase project URL + public key
+js/vendor/          supabase-js 2.117.3 (bundled, no CDN needed)
+supabase/setup.sql  Database tables, security rules and image storage
 ```
+
+## Setting up accounts, uploads and critiques (free)
+
+The studio app stores accounts, artwork and critiques in
+[Supabase](https://supabase.com) — the free plan includes logins, a
+database and 1 GB of image storage. One-time setup, about 5 minutes:
+
+1. **Create a project.** Sign up at supabase.com → *New project*. Pick any
+   name and database password (save it somewhere), choose the region
+   closest to you, and wait a minute for it to finish setting up.
+2. **Create the tables.** In the left sidebar open *SQL Editor* → *New
+   query*. Paste the entire contents of `supabase/setup.sql` and click
+   *Run*. You should see "Success. No rows returned".
+3. **Connect the site.** Go to *Project Settings → API* (or *Data API*).
+   Copy the **Project URL** and the **publishable** key (older projects
+   call it the **anon public** key) into
+   `js/config.js`. Never use the `secret` / `service_role` key.
+4. **Set the return address for emails.** *Authentication → URL
+   Configuration*: set **Site URL** to
+   `https://artforge.hannahjanicke.com/app.html` and add the same address
+   under **Redirect URLs**. This is where confirmation and password-reset
+   links send people.
+5. **Email confirmation (choose one).** Supabase's built-in email sender
+   only sends a few emails per hour, which isn't enough once people start
+   signing up. Either:
+   - turn off *Authentication → Sign In / Providers → Email → Confirm
+     email* so people are logged in straight away, or
+   - keep it on and connect a free email sender (e.g. Resend) under
+     *Authentication → Emails → SMTP Settings*.
+
+Notes:
+- Free Supabase projects **pause after a week with no activity**. Log in
+  to supabase.com and click *Restore* if the site stops loading pieces.
+- Uploaded images are private: only signed-in ArtForge members can see
+  them, through links that expire after an hour.
+- Everyone who is signed in can see and critique every piece (that's the
+  point of the site), but people can only edit or delete their own
+  pieces, versions and critiques.
 
 ## The 3D hero
 
@@ -76,4 +121,5 @@ python3 -m http.server 8080
 ## Deploying
 
 Static site — deploys as-is to Vercel, Netlify, GitHub Pages, or any
-static host, no build command needed.
+static host, no build command needed. The app's data lives in Supabase,
+so nothing else needs a server.
